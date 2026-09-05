@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -15,349 +15,54 @@ import "./App.css";
 // ============================================================
 
 const destinations = [
-  {
-    name: "Leh",
-    state: "Ladakh",
-    category: "Mountains",
-    emoji: "🏔️",
-    imageQuery: "Leh Palace Ladakh",
+  ["Leh", "Ladakh", "Mountains", "🏔️"],
+  ["Manali", "Himachal Pradesh", "Mountains", "🏔️"],
+  ["Shimla", "Himachal Pradesh", "Mountains", "🌲"],
+  ["Meghalaya", "Northeast India", "Nature", "🌿"],
+  ["Sikkim", "Northeast India", "Mountains", "🏔️"],
+  ["Gangtok", "Sikkim", "Mountains", "⛰️"],
+  ["Darjeeling", "West Bengal", "Nature", "🍃"],
+  ["Goa", "Goa", "Beach", "🏖️"],
+  ["Andaman", "Andaman & Nicobar Islands", "Beach", "🌊"],
+  ["Lakshadweep", "India", "Beach", "🏝️"],
+  ["Kerala", "Kerala", "Nature", "🌴"],
+  ["Munnar", "Kerala", "Nature", "🍃"],
+  ["Alappuzha", "Kerala", "Nature", "🚤"],
+  ["Ooty", "Tamil Nadu", "Nature", "🌲"],
+  ["Kodaikanal", "Tamil Nadu", "Nature", "🌲"],
+  ["Varanasi", "Uttar Pradesh", "Culture", "🪔"],
+  ["Agra", "Uttar Pradesh", "Heritage", "🏛️"],
+  ["Jaipur", "Rajasthan", "Heritage", "🏰"],
+  ["Udaipur", "Rajasthan", "Heritage", "🏰"],
+  ["Jaisalmer", "Rajasthan", "Heritage", "🐪"],
+  ["Jodhpur", "Rajasthan", "Heritage", "🏰"],
+  ["Rishikesh", "Uttarakhand", "Adventure", "🧘"],
+  ["Mussoorie", "Uttarakhand", "Mountains", "🌲"],
+  ["Kashmir", "Jammu & Kashmir", "Mountains", "🏔️"],
+  ["Srinagar", "Jammu & Kashmir", "Nature", "🚣"],
+  ["Amritsar", "Punjab", "Culture", "🛕"],
+  ["Delhi", "Delhi", "Culture", "🏙️"],
+  ["Mumbai", "Maharashtra", "City", "🌆"],
+  ["Pune", "Maharashtra", "City", "🏙️"],
+  ["Hyderabad", "Telangana", "Culture", "🕌"],
+  ["Bengaluru", "Karnataka", "City", "🌆"],
+  ["Mysore", "Karnataka", "Heritage", "🏛️"],
+  ["Hampi", "Karnataka", "Heritage", "🏛️"],
+  ["Kolkata", "West Bengal", "Culture", "🌆"],
+  ["Bhubaneswar", "Odisha", "Heritage", "🛕"],
+  ["Puri", "Odisha", "Beach", "🌊"],
+  ["Guwahati", "Assam", "Nature", "🌿"],
+  ["Kaziranga", "Assam", "Wildlife", "🦏"],
+].map(
+  ([name, state, category, emoji]) => ({
+    name,
+    state,
+    category,
+    emoji,
     description:
-      "High-altitude landscapes, monasteries and unforgettable Himalayan roads.",
-  },
-  {
-    name: "Manali",
-    state: "Himachal Pradesh",
-    category: "Mountains",
-    emoji: "🏔️",
-    imageQuery: "Solang Valley Manali Himachal Pradesh",
-    description:
-      "Snowy peaks, valleys, cafes and adventurous mountain experiences.",
-  },
-  {
-    name: "Shimla",
-    state: "Himachal Pradesh",
-    category: "Mountains",
-    emoji: "🌲",
-    imageQuery: "Shimla Ridge Christ Church Himachal Pradesh",
-    description:
-      "Colonial charm, mountain views and peaceful Himalayan escapes.",
-  },
-  {
-    name: "Meghalaya",
-    state: "Northeast India",
-    category: "Nature",
-    emoji: "🌿",
-    imageQuery: "Nohkalikai Falls Meghalaya",
-    description:
-      "Living root bridges, waterfalls, caves and lush green landscapes.",
-  },
-  {
-    name: "Sikkim",
-    state: "Northeast India",
-    category: "Mountains",
-    emoji: "🏔️",
-    imageQuery: "Tsomgo Lake Sikkim",
-    description:
-      "Himalayan monasteries, alpine lakes and dramatic mountain scenery.",
-  },
-  {
-    name: "Gangtok",
-    state: "Sikkim",
-    category: "Mountains",
-    emoji: "⛰️",
-    imageQuery: "Gangtok Sikkim mountains",
-    description:
-      "A beautiful Himalayan city with monasteries and mountain views.",
-  },
-  {
-    name: "Darjeeling",
-    state: "West Bengal",
-    category: "Nature",
-    emoji: "🍃",
-    imageQuery: "Darjeeling tea gardens Kanchenjunga",
-    description:
-      "Tea gardens, toy trains and spectacular Kanchenjunga views.",
-  },
-  {
-    name: "Goa",
-    state: "Goa",
-    category: "Beach",
-    emoji: "🏖️",
-    imageQuery: "Baga Beach Goa",
-    description:
-      "Golden beaches, Portuguese heritage, food and vibrant nightlife.",
-  },
-  {
-    name: "Andaman",
-    state: "Andaman & Nicobar Islands",
-    category: "Beach",
-    emoji: "🌊",
-    imageQuery: "Radhanagar Beach Havelock Andaman",
-    description:
-      "Turquoise waters, coral reefs and tropical island adventures.",
-  },
-  {
-    name: "Lakshadweep",
-    state: "India",
-    category: "Beach",
-    emoji: "🏝️",
-    imageQuery: "Lakshadweep lagoon islands",
-    description:
-      "Crystal-clear lagoons, coral reefs and peaceful island scenery.",
-  },
-  {
-    name: "Kerala",
-    state: "Kerala",
-    category: "Nature",
-    emoji: "🌴",
-    imageQuery: "Kerala backwaters Alleppey",
-    description:
-      "Backwaters, tropical landscapes, beaches and rich local culture.",
-  },
-  {
-    name: "Munnar",
-    state: "Kerala",
-    category: "Nature",
-    emoji: "🍃",
-    imageQuery: "Munnar tea plantations Kerala",
-    description:
-      "Rolling tea plantations, misty hills and refreshing mountain air.",
-  },
-  {
-    name: "Alappuzha",
-    state: "Kerala",
-    category: "Nature",
-    emoji: "🚤",
-    imageQuery: "Alappuzha Kerala houseboat backwaters",
-    description:
-      "Serene backwaters, houseboats and beautiful Kerala villages.",
-  },
-  {
-    name: "Ooty",
-    state: "Tamil Nadu",
-    category: "Nature",
-    emoji: "🌲",
-    imageQuery: "Ooty Nilgiri Hills tea gardens",
-    description:
-      "Cool weather, tea estates, gardens and scenic Nilgiri hills.",
-  },
-  {
-    name: "Kodaikanal",
-    state: "Tamil Nadu",
-    category: "Nature",
-    emoji: "🌲",
-    imageQuery: "Kodaikanal Lake Tamil Nadu",
-    description:
-      "Misty hills, forests, lakes and peaceful southern mountain views.",
-  },
-  {
-    name: "Varanasi",
-    state: "Uttar Pradesh",
-    category: "Culture",
-    emoji: "🪔",
-    imageQuery: "Dashashwamedh Ghat Varanasi Ganga Aarti",
-    description:
-      "Ancient ghats, Ganga Aarti, temples and timeless spiritual culture.",
-  },
-  {
-    name: "Agra",
-    state: "Uttar Pradesh",
-    category: "Heritage",
-    emoji: "🏛️",
-    imageQuery: "Taj Mahal Agra India",
-    description:
-      "Home to the Taj Mahal and some of India's most iconic heritage sites.",
-  },
-  {
-    name: "Jaipur",
-    state: "Rajasthan",
-    category: "Heritage",
-    emoji: "🏰",
-    imageQuery: "Hawa Mahal Jaipur Rajasthan",
-    description:
-      "Palaces, forts, colourful markets and Rajasthan's royal heritage.",
-  },
-  {
-    name: "Udaipur",
-    state: "Rajasthan",
-    category: "Heritage",
-    emoji: "🏰",
-    imageQuery: "Lake Pichola Udaipur City Palace",
-    description:
-      "Romantic lakes, palaces and beautiful Mewar architecture.",
-  },
-  {
-    name: "Jaisalmer",
-    state: "Rajasthan",
-    category: "Heritage",
-    emoji: "🐪",
-    imageQuery: "Jaisalmer Fort Rajasthan",
-    description:
-      "Golden sandstone architecture, forts and desert experiences.",
-  },
-  {
-    name: "Jodhpur",
-    state: "Rajasthan",
-    category: "Heritage",
-    emoji: "🏰",
-    imageQuery: "Mehrangarh Fort Jodhpur",
-    description:
-      "The Blue City, Mehrangarh Fort and colourful Rajasthani streets.",
-  },
-  {
-    name: "Rishikesh",
-    state: "Uttarakhand",
-    category: "Adventure",
-    emoji: "🧘",
-    imageQuery: "Lakshman Jhula Rishikesh Ganga",
-    description:
-      "Yoga, rafting, riverside cafes and Himalayan adventure.",
-  },
-  {
-    name: "Mussoorie",
-    state: "Uttarakhand",
-    category: "Mountains",
-    emoji: "🌲",
-    imageQuery: "Mussoorie Uttarakhand mountains",
-    description:
-      "A charming hill station surrounded by Himalayan foothills.",
-  },
-  {
-    name: "Kashmir",
-    state: "Jammu & Kashmir",
-    category: "Mountains",
-    emoji: "🏔️",
-    imageQuery: "Kashmir valley snow mountains",
-    description:
-      "Snow-capped mountains, valleys, lakes and breathtaking scenery.",
-  },
-  {
-    name: "Srinagar",
-    state: "Jammu & Kashmir",
-    category: "Nature",
-    emoji: "🚣",
-    imageQuery: "Dal Lake Srinagar houseboats",
-    description:
-      "Dal Lake, houseboats, Mughal gardens and Himalayan beauty.",
-  },
-  {
-    name: "Amritsar",
-    state: "Punjab",
-    category: "Culture",
-    emoji: "🛕",
-    imageQuery: "Golden Temple Amritsar",
-    description:
-      "Golden Temple, Punjabi cuisine and deeply meaningful history.",
-  },
-  {
-    name: "Delhi",
-    state: "Delhi",
-    category: "Culture",
-    emoji: "🏙️",
-    imageQuery: "India Gate New Delhi",
-    description:
-      "A fascinating mix of ancient monuments, food and modern city life.",
-  },
-  {
-    name: "Mumbai",
-    state: "Maharashtra",
-    category: "City",
-    emoji: "🌆",
-    imageQuery: "Gateway of India Mumbai",
-    description:
-      "India's energetic coastal metropolis filled with food and culture.",
-  },
-  {
-    name: "Pune",
-    state: "Maharashtra",
-    category: "City",
-    emoji: "🏙️",
-    imageQuery: "Shaniwar Wada Pune",
-    description:
-      "A youthful city combining history, education, food and culture.",
-  },
-  {
-    name: "Hyderabad",
-    state: "Telangana",
-    category: "Culture",
-    emoji: "🕌",
-    imageQuery: "Charminar Hyderabad",
-    description:
-      "Historic architecture, biryani, bazaars and modern city life.",
-  },
-  {
-    name: "Bengaluru",
-    state: "Karnataka",
-    category: "City",
-    emoji: "🌆",
-    imageQuery: "Vidhana Soudha Bengaluru",
-    description:
-      "India's tech capital with gardens, cafes and a vibrant culture.",
-  },
-  {
-    name: "Mysore",
-    state: "Karnataka",
-    category: "Heritage",
-    emoji: "🏛️",
-    imageQuery: "Mysore Palace Karnataka",
-    description:
-      "Palaces, royal heritage, markets and famous South Indian cuisine.",
-  },
-  {
-    name: "Hampi",
-    state: "Karnataka",
-    category: "Heritage",
-    emoji: "🏛️",
-    imageQuery: "Virupaksha Temple Hampi Karnataka",
-    description:
-      "Ancient ruins, giant boulders and spectacular Vijayanagara heritage.",
-  },
-  {
-    name: "Kolkata",
-    state: "West Bengal",
-    category: "Culture",
-    emoji: "🌆",
-    imageQuery: "Victoria Memorial Kolkata",
-    description:
-      "Art, literature, colonial architecture and legendary Bengali food.",
-  },
-  {
-    name: "Bhubaneswar",
-    state: "Odisha",
-    category: "Heritage",
-    emoji: "🛕",
-    imageQuery: "Lingaraj Temple Bhubaneswar",
-    description:
-      "Ancient temples and a gateway to Odisha's rich cultural heritage.",
-  },
-  {
-    name: "Puri",
-    state: "Odisha",
-    category: "Beach",
-    emoji: "🌊",
-    imageQuery: "Puri Beach Odisha",
-    description:
-      "A famous coastal destination blending beaches, temples and culture.",
-  },
-  {
-    name: "Guwahati",
-    state: "Assam",
-    category: "Nature",
-    emoji: "🌿",
-    imageQuery: "Brahmaputra River Guwahati Assam",
-    description:
-      "Gateway to Northeast India with temples, rivers and nearby nature.",
-  },
-  {
-    name: "Kaziranga",
-    state: "Assam",
-    category: "Wildlife",
-    emoji: "🦏",
-    imageQuery: "One horned rhinoceros Kaziranga National Park",
-    description:
-      "One-horned rhinos, grasslands and unforgettable wildlife experiences.",
-  },
-];
+      `Discover the culture, food, experiences and attractions of ${name}.`,
+  })
+);
 
 
 // ============================================================
@@ -376,107 +81,100 @@ const categories = [
   "City",
 ];
 
+const categoryIcons = {
+  All: "🌈",
+  Mountains: "🏔️",
+  Beach: "🏖️",
+  Nature: "🌿",
+  Heritage: "🏰",
+  Culture: "🪔",
+  Adventure: "🧘",
+  Wildlife: "🦏",
+  City: "🌆",
+};
+
 
 // ============================================================
-// MAP COORDINATES
+// MAP
 // ============================================================
 
 const destinationCoordinates = {
   Leh: [34.1526, 77.5771],
   Manali: [32.2432, 77.1892],
   Shimla: [31.1048, 77.1734],
-
   Meghalaya: [25.467, 91.3662],
   Sikkim: [27.533, 88.5122],
   Gangtok: [27.3389, 88.6065],
   Darjeeling: [27.041, 88.2663],
-
   Goa: [15.2993, 74.124],
   Andaman: [11.7401, 92.6586],
   Lakshadweep: [10.5667, 72.6417],
-
   Kerala: [10.8505, 76.2711],
   Munnar: [10.0889, 77.0595],
   Alappuzha: [9.4981, 76.3388],
-
   Ooty: [11.4102, 76.695],
   Kodaikanal: [10.2381, 77.4892],
-
   Varanasi: [25.3176, 82.9739],
   Agra: [27.1767, 78.0081],
-
   Jaipur: [26.9124, 75.7873],
   Udaipur: [24.5854, 73.7125],
   Jaisalmer: [26.9157, 70.9083],
   Jodhpur: [26.2389, 73.0243],
-
   Rishikesh: [30.0869, 78.2676],
   Mussoorie: [30.4598, 78.0644],
-
   Kashmir: [34.0837, 74.7973],
   Srinagar: [34.0837, 74.7973],
-
   Amritsar: [31.634, 74.8723],
   Delhi: [28.6139, 77.209],
   Mumbai: [19.076, 72.8777],
   Pune: [18.5204, 73.8567],
-
   Hyderabad: [17.385, 78.4867],
   Bengaluru: [12.9716, 77.5946],
-
   Mysore: [12.2958, 76.6394],
   Hampi: [15.335, 76.46],
-
   Kolkata: [22.5726, 88.3639],
-
   Bhubaneswar: [20.2961, 85.8245],
   Puri: [19.8135, 85.8312],
-
   Guwahati: [26.1445, 91.7362],
   Kaziranga: [26.5775, 93.1711],
 };
 
 
 // ============================================================
-// YATRA AI MAP
+// MAP COMPONENT
 // ============================================================
 
 function YatraMap({ destination }) {
 
-  const matchedDestination =
-    Object.keys(destinationCoordinates).find(
-      (key) =>
-        key.toLowerCase() ===
-        destination?.trim().toLowerCase()
-    );
+  const match =
+    Object.keys(destinationCoordinates)
+      .find(
+        key =>
+          key.toLowerCase() ===
+          destination?.trim().toLowerCase()
+      );
 
-  const coordinates =
-    destinationCoordinates[matchedDestination];
+  if (!match) {
 
-
-  if (!coordinates) {
     return (
       <div className="map-placeholder">
-
         <div className="map-placeholder-icon">
           🗺️
         </div>
 
-        <h3>
-          Map coming up
-        </h3>
+        <h3>Map unavailable</h3>
 
         <p>
-          We couldn't find map coordinates for{" "}
-          <strong>
-            {destination}
-          </strong>.
+          Coordinates are not currently available for{" "}
+          <strong>{destination}</strong>.
         </p>
-
       </div>
     );
+
   }
 
+  const coordinates =
+    destinationCoordinates[match];
 
   return (
     <div className="yatra-map-wrapper">
@@ -493,22 +191,12 @@ function YatraMap({ destination }) {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <Marker
-          position={coordinates}
-        >
-
+        <Marker position={coordinates}>
           <Popup>
-
-            <strong>
-              📍 {matchedDestination}
-            </strong>
-
+            <strong>📍 {match}</strong>
             <br />
-
             Your Yatra AI destination
-
           </Popup>
-
         </Marker>
 
       </MapContainer>
@@ -530,14 +218,77 @@ function App() {
   const [showItinerary, setShowItinerary] =
     useState(false);
 
-  const [showScamChecker, setShowScamChecker] =
+  const [showSafety, setShowSafety] =
     useState(false);
+
+  const [showLocalInsights, setShowLocalInsights] =
+    useState(false);
+
+  const [showSmartGuide, setShowSmartGuide] =
+    useState(false);
+
+  // Background Video Control
+  const heroVideoRef = useRef(null);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(true);
+
+  const toggleVideoPlay = () => {
+    if (heroVideoRef.current) {
+      if (heroVideoRef.current.paused) {
+        heroVideoRef.current.play();
+        setIsVideoPlaying(true);
+      } else {
+        heroVideoRef.current.pause();
+        setIsVideoPlaying(false);
+      }
+    }
+  };
+
+  // Interactive Destination Wishlist
+  const [likedDestinations, setLikedDestinations] = useState({});
+
+  const toggleLike = (e, destName) => {
+    e.stopPropagation();
+    setLikedDestinations(prev => ({
+      ...prev,
+      [destName]: !prev[destName],
+    }));
+  };
+
+  // ==========================================================
+  // LOGIN / ACCOUNT
+  // ==========================================================
+
+  const [showLogin, setShowLogin] = useState(false);
+  const [authMode, setAuthMode] = useState("login");
+  const [authName, setAuthName] = useState("");
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("yatraUser") || "null");
+    } catch {
+      return null;
+    }
+  });
 
   const [itinerary, setItinerary] =
     useState("");
 
   const [budgetBreakdown, setBudgetBreakdown] =
     useState(null);
+
+  const [localInsights, setLocalInsights] =
+    useState(null);
+
+  const [localLoading, setLocalLoading] =
+    useState(false);
+
+  const [safetyData, setSafetyData] =
+    useState(null);
+
+  const [safetyLoading, setSafetyLoading] =
+    useState(false);
 
   const [scamText, setScamText] =
     useState("");
@@ -548,17 +299,30 @@ function App() {
   const [scamLoading, setScamLoading] =
     useState(false);
 
+  const [guidePlace, setGuidePlace] =
+    useState("");
+
+  const [guideResult, setGuideResult] =
+    useState("");
+
+  const [guideLoading, setGuideLoading] =
+    useState(false);
+
+  const [cameraOn, setCameraOn] =
+    useState(false);
+
   const [loading, setLoading] =
     useState(false);
 
-  const [trip, setTrip] = useState({
-    destination: "",
-    startDate: "",
-    endDate: "",
-    travelers: 2,
-    budget: "",
-    interests: "",
-  });
+  const [trip, setTrip] =
+    useState({
+      destination: "",
+      startDate: "",
+      endDate: "",
+      travelers: 2,
+      budget: "",
+      interests: "",
+    });
 
   const [selectedCategory, setSelectedCategory] =
     useState("All");
@@ -569,103 +333,92 @@ function App() {
   const [images, setImages] =
     useState({});
 
+  const [videoStream, setVideoStream] =
+    useState(null);
 
-  // ============================================================
-  // LOAD WIKIMEDIA IMAGES
-  // ============================================================
+
+  // ==========================================================
+  // DESTINATION IMAGES
+  // ==========================================================
 
   useEffect(() => {
 
     let cancelled = false;
 
-    const loadImages = async () => {
+    async function loadImages() {
 
-      const imageMap = {};
+      const result = {};
 
       await Promise.all(
+        destinations.map(async destination => {
 
-        destinations.map(
-          async (destination) => {
+          try {
 
-            try {
+            const url =
+              "https://commons.wikimedia.org/w/api.php" +
+              "?action=query" +
+              "&generator=search" +
+              "&gsrsearch=" +
+              encodeURIComponent(
+                destination.name
+              ) +
+              "&gsrnamespace=6" +
+              "&gsrlimit=1" +
+              "&prop=imageinfo" +
+              "&iiprop=url" +
+              "&iiurlwidth=800" +
+              "&format=json" +
+              "&origin=*";
 
-              const searchUrl =
-                "https://commons.wikimedia.org/w/api.php" +
-                "?action=query" +
-                "&generator=search" +
-                "&gsrsearch=" +
-                encodeURIComponent(
-                  destination.imageQuery
-                ) +
-                "&gsrnamespace=6" +
-                "&gsrlimit=1" +
-                "&prop=imageinfo" +
-                "&iiprop=url" +
-                "&iiurlwidth=900" +
-                "&format=json" +
-                "&origin=*";
+            const response =
+              await fetch(url);
 
+            if (!response.ok) return;
 
-              const response =
-                await fetch(searchUrl);
+            const data =
+              await response.json();
 
+            const pages =
+              data?.query?.pages;
 
-              if (!response.ok) return;
+            if (!pages) return;
 
+            const page =
+              Object.values(pages)[0];
 
-              const data =
-                await response.json();
+            const image =
+              page?.imageinfo?.[0];
 
+            if (
+              image?.thumburl ||
+              image?.url
+            ) {
 
-              const pages =
-                data?.query?.pages;
-
-
-              if (!pages) return;
-
-
-              const page =
-                Object.values(pages)[0];
-
-
-              const imageInfo =
-                page?.imageinfo?.[0];
-
-
-              if (
-                imageInfo?.thumburl ||
-                imageInfo?.url
-              ) {
-
-                imageMap[destination.name] =
-                  imageInfo.thumburl ||
-                  imageInfo.url;
-
-              }
-
-            } catch (error) {
-
-              console.warn(
-                `Image unavailable for ${destination.name}`,
-                error
-              );
+              result[destination.name] =
+                image.thumburl ||
+                image.url;
 
             }
 
+          } catch (error) {
+
+            console.warn(
+              "Image unavailable:",
+              destination.name
+            );
+
           }
-        )
+
+        })
       );
 
-
       if (!cancelled) {
-        setImages(imageMap);
+        setImages(result);
       }
 
-    };
-
+    }
 
     loadImages();
-
 
     return () => {
       cancelled = true;
@@ -674,63 +427,62 @@ function App() {
   }, []);
 
 
-  // ============================================================
-  // FILTER DESTINATIONS
-  // ============================================================
+  // ==========================================================
+  // FILTER
+  // ==========================================================
 
   const filteredDestinations =
     useMemo(() => {
 
-      const searchValue =
+      const value =
         search.trim().toLowerCase();
 
-
       return destinations.filter(
-        (destination) => {
+        destination => {
 
-          const matchesCategory =
+          const categoryMatch =
             selectedCategory === "All" ||
             destination.category ===
               selectedCategory;
 
-
-          const matchesSearch =
-            !searchValue ||
+          const searchMatch =
+            !value ||
             destination.name
               .toLowerCase()
-              .includes(searchValue) ||
+              .includes(value) ||
             destination.state
               .toLowerCase()
-              .includes(searchValue) ||
+              .includes(value) ||
             destination.category
               .toLowerCase()
-              .includes(searchValue);
-
+              .includes(value);
 
           return (
-            matchesCategory &&
-            matchesSearch
+            categoryMatch &&
+            searchMatch
           );
 
         }
       );
 
-    }, [selectedCategory, search]);
+    }, [
+      selectedCategory,
+      search,
+    ]);
 
 
-  // ============================================================
-  // FORM HANDLER
-  // ============================================================
+  // ==========================================================
+  // FORM
+  // ==========================================================
 
-  const handleChange = (e) => {
+  const handleChange = e => {
 
     const {
       name,
       value,
     } = e.target;
 
-
-    setTrip((previous) => ({
+    setTrip(previous => ({
       ...previous,
       [name]: value,
     }));
@@ -738,339 +490,754 @@ function App() {
   };
 
 
-  // ============================================================
+  // ==========================================================
   // OPEN PLANNER
-  // ============================================================
+  // ==========================================================
 
-  const openPlannerForDestination =
-    (destination) => {
+  const openPlanner =
+    destination => {
 
-      setTrip((previous) => ({
-        ...previous,
-        destination,
-      }));
+      if (destination) {
+
+        setTrip(previous => ({
+          ...previous,
+          destination,
+        }));
+
+      }
 
       setShowPlanner(true);
 
     };
 
 
-  // ============================================================
-  // FORMAT ITINERARY
-  // ============================================================
+  // ==========================================================
+  // ITINERARY PARSER
+  // ==========================================================
 
-  const formatItinerary = (text) => {
+  const formatItinerary =
+    text => {
 
-    if (!text) return [];
+      if (!text?.trim()) {
+        return [];
+      }
 
-
-    const cleanedText =
-      text
-        .replace(/\r\n/g, "\n")
-        .replace(/\*\*/g, "");
-
-
-    const sections =
-      cleanedText.split(
-        /(?=Day\s+\d+)/i
-      );
+      let cleaned =
+        text
+          .replace(/\r\n/g, "\n")
+          .replace(/\*\*/g, "")
+          .replace(/^#+\s*/gm, "")
+          .trim();
 
 
-    return sections
-      .filter(
-        (section) =>
-          section.trim()
-      )
-      .map(
-        (section, index) => {
-
-          const lines =
-            section
-              .trim()
-              .split("\n");
+      // Normalize "DAY 1", "day 1:", etc.
+      cleaned =
+        cleaned.replace(
+          /^\s*DAY\s+(\d+)\s*[:\-—]?\s*$/gim,
+          "Day $1"
+        );
 
 
-          const dayNumber =
-            lines[0]?.match(
-              /Day\s+(\d+)/i
-            )?.[1];
+      // Find every actual Day heading.
+      const matches =
+        [
+          ...cleaned.matchAll(
+            /^\s*Day\s+(\d+)\s*$/gim
+          ),
+        ];
 
 
-          const title =
-            `Day ${dayNumber || index + 1}`;
+      if (!matches.length) {
+
+        return [
+          {
+            number: 1,
+            title: "Day 1",
+            content: cleaned,
+          },
+        ];
+
+      }
 
 
-          let content =
-            section.trim();
+      const days = [];
 
+      matches.forEach(
+        (match, index) => {
 
-          if (lines.length > 1) {
-            content =
-              lines
-                .slice(1)
-                .join("\n")
-                .trim();
-          }
+          const number =
+            Number(match[1]);
 
+          const start =
+            match.index +
+            match[0].length;
 
-          return {
-            title,
+          const end =
+            index + 1 <
+            matches.length
+              ? matches[index + 1].index
+              : cleaned.length;
+
+          const content =
+            cleaned
+              .slice(start, end)
+              .trim();
+
+          days.push({
+            number,
+            title: `Day ${number}`,
             content,
-          };
+          });
 
         }
       );
 
-  };
+
+      return days;
+
+    };
 
 
   const itineraryDays =
     formatItinerary(itinerary);
 
 
-  // ============================================================
-  // AI TRIP PLANNER
-  // ============================================================
+  // ==========================================================
+  // GENERATE TRIP
+  // ==========================================================
 
-  const handleSubmit = async (e) => {
+  const handleSubmit =
+    async e => {
 
-    e.preventDefault();
-
-    setLoading(true);
-
-
-    try {
-
-      const response =
-        await fetch(
-          "http://localhost:5000/api/plan-trip",
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-
-            body:
-              JSON.stringify(trip),
-          }
-        );
-
-
-      const data =
-        await response.json();
-
+      e.preventDefault();
 
       if (
-        !response.ok ||
-        !data.success
+        new Date(trip.endDate) <
+        new Date(trip.startDate)
       ) {
 
-        throw new Error(
-          data.message ||
-            "Failed to generate itinerary"
+        alert(
+          "End date cannot be before the start date."
+        );
+
+        return;
+
+      }
+
+      setLoading(true);
+
+      try {
+
+        const response =
+          await fetch(
+            "http://localhost:5000/api/plan-trip",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+
+              body:
+                JSON.stringify(trip),
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (
+          !response.ok ||
+          !data.success
+        ) {
+
+          throw new Error(
+            data.message ||
+              "Unable to generate itinerary."
+          );
+
+        }
+
+        setItinerary(
+          data.itinerary || ""
+        );
+
+        setBudgetBreakdown(
+          data.budgetBreakdown ||
+            null
+        );
+
+        setShowPlanner(false);
+        setShowItinerary(true);
+
+      } catch (error) {
+
+        console.error(error);
+
+        alert(
+          "Unable to generate your itinerary. Make sure Ollama and the Yatra AI backend are running."
+        );
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+
+  // ==========================================================
+  // LOCAL INSIGHTS
+  // ==========================================================
+
+  const loadLocalInsights =
+    async () => {
+
+      if (!trip.destination?.trim()) {
+
+        alert(
+          "Please select a destination first."
+        );
+
+        setShowPlanner(true);
+
+        return;
+
+      }
+
+      setLocalLoading(true);
+      setLocalInsights(null);
+
+      try {
+
+        const response =
+          await fetch(
+            "http://localhost:5000/api/local-insights",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+
+              body:
+                JSON.stringify({
+                  destination:
+                    trip.destination.trim(),
+                }),
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (
+          !response.ok ||
+          !data.success
+        ) {
+
+          throw new Error(
+            data.message ||
+              "Unable to load Local Insights."
+          );
+
+        }
+
+        setLocalInsights(
+          data.insights
+        );
+
+        setShowLocalInsights(true);
+
+      } catch (error) {
+
+        console.error(
+          "Local Insights Error:",
+          error
+        );
+
+        alert(
+          error.message ||
+            "Unable to load Local Insights."
+        );
+
+      } finally {
+
+        setLocalLoading(false);
+
+      }
+
+    };
+
+
+  // ==========================================================
+  // TRAVEL SAFETY
+  // ==========================================================
+
+  const loadSafety =
+    async () => {
+
+      if (!trip.destination) {
+
+        alert(
+          "Please select a destination first."
+        );
+
+        setShowPlanner(true);
+
+        return;
+
+      }
+
+      setSafetyLoading(true);
+      setSafetyData(null);
+      setScamResult("");
+
+      try {
+
+        const response =
+          await fetch(
+            "http://localhost:5000/api/travel-safety",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+
+              body:
+                JSON.stringify({
+                  destination:
+                    trip.destination,
+
+                  startDate:
+                    trip.startDate,
+
+                  interests:
+                    trip.interests,
+                }),
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (
+          !response.ok ||
+          !data.success
+        ) {
+
+          throw new Error(
+            data.message ||
+              "Unable to load safety."
+          );
+
+        }
+
+        setSafetyData(data);
+
+        setShowSafety(true);
+
+      } catch (error) {
+
+        console.error(error);
+
+        alert(
+          "Unable to load Travel Safety."
+        );
+
+      } finally {
+
+        setSafetyLoading(false);
+
+      }
+
+    };
+
+
+  // ==========================================================
+  // SCAM CHECK
+  // ==========================================================
+
+  const handleScamCheck =
+    async () => {
+
+      if (!scamText.trim()) {
+
+        alert(
+          "Describe the offer, message or situation first."
+        );
+
+        return;
+
+      }
+
+      setScamLoading(true);
+      setScamResult("");
+
+      try {
+
+        const response =
+          await fetch(
+            "http://localhost:5000/api/check-scam",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+
+              body:
+                JSON.stringify({
+                  text: scamText,
+                  destination:
+                    trip.destination ||
+                    "Unknown",
+                }),
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (
+          !response.ok ||
+          !data.success
+        ) {
+
+          throw new Error(
+            data.message ||
+              "Unable to check scam."
+          );
+
+        }
+
+        setScamResult(
+          data.result || ""
+        );
+
+      } catch (error) {
+
+        console.error(error);
+
+        alert(
+          "Unable to connect to the scam detector."
+        );
+
+      } finally {
+
+        setScamLoading(false);
+
+      }
+
+    };
+
+
+  // ==========================================================
+  // CAMERA
+  // ==========================================================
+
+  const startCamera =
+    async () => {
+
+      try {
+
+        const stream =
+          await navigator.mediaDevices.getUserMedia(
+            {
+              video: {
+                facingMode: {
+                  ideal: "environment",
+                },
+              },
+
+              audio: false,
+            }
+          );
+
+        setVideoStream(stream);
+        setCameraOn(true);
+
+      } catch (error) {
+
+        console.error(error);
+
+        alert(
+          "Camera permission was not available. Please allow camera access in your browser."
         );
 
       }
 
-
-      setItinerary(
-        data.itinerary || ""
-      );
+    };
 
 
-      setBudgetBreakdown(
-        data.budgetBreakdown || null
-      );
+  const stopCamera =
+    () => {
+
+      if (videoStream) {
+
+        videoStream
+          .getTracks()
+          .forEach(track =>
+            track.stop()
+          );
+
+      }
+
+      setVideoStream(null);
+      setCameraOn(false);
+
+    };
 
 
-      setShowPlanner(false);
+  useEffect(() => {
 
-      setShowItinerary(true);
+    return () => {
+
+      if (videoStream) {
+
+        videoStream
+          .getTracks()
+          .forEach(track =>
+            track.stop()
+          );
+
+      }
+
+    };
+
+  }, [videoStream]);
 
 
-    } catch (error) {
+  // ==========================================================
+  // SMART GUIDE
+  // ==========================================================
 
-      console.error(error);
+  const generateGuide =
+    async () => {
+
+      if (!trip.destination) {
+
+        alert(
+          "Please select a destination first."
+        );
+
+        return;
+
+      }
+
+      if (!guidePlace.trim()) {
+
+        alert(
+          "Enter or select the place you are looking at."
+        );
+
+        return;
+
+      }
+
+      setGuideLoading(true);
+      setGuideResult("");
+
+      try {
+
+        const response =
+          await fetch(
+            "http://localhost:5000/api/smart-guide",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+
+              body:
+                JSON.stringify({
+                  destination:
+                    trip.destination,
+
+                  place:
+                    guidePlace,
+                }),
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (
+          !response.ok ||
+          !data.success
+        ) {
+
+          throw new Error(
+            data.message ||
+              "Unable to generate guide."
+          );
+
+        }
+
+        setGuideResult(
+          data.guide || ""
+        );
+
+      } catch (error) {
+
+        console.error(error);
+
+        alert(
+          "Unable to generate Smart Tourist Guide."
+        );
+
+      } finally {
+
+        setGuideLoading(false);
+
+      }
+
+    };
 
 
-      alert(
-        "Unable to generate your itinerary. Make sure the Yatra AI backend and Ollama are running."
-      );
+  // ==========================================================
+  // LOGIN / REGISTER
+  // ==========================================================
 
-    } finally {
-
-      setLoading(false);
-
-    }
-
+  const resetAuthForm = () => {
+    setAuthName("");
+    setAuthEmail("");
+    setAuthPassword("");
   };
 
+  const handleAuthSubmit = async e => {
+    e.preventDefault();
 
-  // ============================================================
-  // SCAM DETECTOR
-  // ============================================================
-
-  const handleScamCheck = async () => {
-
-    if (!scamText.trim()) {
-
-      alert(
-        "Please describe the offer, message, price, or situation you want to check."
-      );
-
+    if (!authEmail.trim() || !authPassword.trim()) {
+      alert("Please enter your email and password.");
       return;
     }
 
-
-    setScamLoading(true);
-
-    setScamResult("");
-
-
-    try {
-
-      const response =
-        await fetch(
-          "http://localhost:5000/api/check-scam",
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-
-            body: JSON.stringify({
-
-              text: scamText,
-
-              destination:
-                trip.destination ||
-                "Unknown destination",
-
-            }),
-          }
-        );
-
-
-      const data =
-        await response.json();
-
-
-      if (
-        !response.ok ||
-        !data.success
-      ) {
-
-        throw new Error(
-          data.message ||
-            "Unable to analyze the situation"
-        );
-
-      }
-
-
-      setScamResult(
-        data.result || ""
-      );
-
-
-    } catch (error) {
-
-      console.error(error);
-
-
-      alert(
-        "Unable to connect to Yatra AI. Make sure the backend and Ollama are running."
-      );
-
-
-    } finally {
-
-      setScamLoading(false);
-
+    if (authMode === "register" && !authName.trim()) {
+      alert("Please enter your name.");
+      return;
     }
 
+    if (authPassword.length < 6) {
+      alert("Password must contain at least 6 characters.");
+      return;
+    }
+
+    setAuthLoading(true);
+
+    try {
+      const endpoint = authMode === "register"
+        ? "http://localhost:5000/api/auth/register"
+        : "http://localhost:5000/api/auth/login";
+
+      const body = authMode === "register"
+        ? { name: authName.trim(), email: authEmail.trim(), password: authPassword }
+        : { email: authEmail.trim(), password: authPassword };
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Authentication failed.");
+      }
+
+      setCurrentUser(data.user);
+      localStorage.setItem("yatraUser", JSON.stringify(data.user));
+      if (data.token) localStorage.setItem("yatraToken", data.token);
+      setShowLogin(false);
+      resetAuthForm();
+
+      alert(
+        authMode === "register"
+          ? "Account created successfully! Welcome to Yatra AI."
+          : `Welcome back, ${data.user.name}!`
+      );
+    } catch (error) {
+      console.error("Authentication error:", error);
+      alert(error.message || "Unable to connect to the Yatra AI server.");
+    } finally {
+      setAuthLoading(false);
+    }
   };
 
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem("yatraUser");
+    localStorage.removeItem("yatraToken");
+  };
 
-  // ============================================================
+  // ==========================================================
   // NAVIGATION
-  // ============================================================
+  // ==========================================================
 
-  const goHome = () => {
+  const closeAll =
+    () => {
 
-    setShowPlanner(false);
+      setShowPlanner(false);
+      setShowItinerary(false);
+      setShowSafety(false);
+      setShowLocalInsights(false);
+      setShowSmartGuide(false);
 
-    setShowItinerary(false);
-
-    setShowScamChecker(false);
-
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-
-  };
+    };
 
 
-  const goExplore = () => {
+  const goHome =
+    () => {
 
-    setShowPlanner(false);
+      closeAll();
 
-    setShowItinerary(false);
-
-    setShowScamChecker(false);
-
-
-    setTimeout(() => {
-
-      document
-        .getElementById("explore")
-        ?.scrollIntoView({
-          behavior: "smooth",
-        });
-
-    }, 50);
-
-  };
-
-
-  // ============================================================
-  // IMAGE ERROR
-  // ============================================================
-
-  const handleImageError =
-    (destinationName) => {
-
-      setImages((previous) => {
-
-        const updated = {
-          ...previous,
-        };
-
-        delete updated[destinationName];
-
-        return updated;
-
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
       });
 
     };
 
 
-  // ============================================================
-  // RETURN
-  // ============================================================
+  const goExplore =
+    () => {
+
+      closeAll();
+
+      setTimeout(() => {
+
+        document
+          .getElementById("explore")
+          ?.scrollIntoView({
+            behavior: "smooth",
+          });
+
+      }, 100);
+
+    };
+
+
+  // ==========================================================
+  // RENDER
+  // ==========================================================
 
   return (
 
     <div className="app">
 
-
-      {/* ================= NAVBAR ================= */}
+      {/* ======================================================
+          NAVBAR
+      ====================================================== */}
 
       <nav className="navbar">
 
@@ -1078,13 +1245,9 @@ function App() {
           className="logo"
           onClick={goHome}
         >
-
-          <span>✈</span>
-
-          Yatra AI
-
+          <span className="logo-icon">✈️</span>
+          <span className="logo-text">Yatra AI</span>
         </div>
-
 
         <ul className="nav-links">
 
@@ -1098,79 +1261,130 @@ function App() {
 
           <li
             onClick={() =>
-              setShowPlanner(true)
+              openPlanner()
             }
           >
             Plan Trip
           </li>
 
           <li
-            onClick={() =>
-              setShowScamChecker(true)
-            }
+            onClick={loadSafety}
           >
             Safety
           </li>
 
+          <li
+            onClick={loadLocalInsights}
+          >
+            Local Insights
+          </li>
+
+          <li
+            onClick={() =>
+              setShowSmartGuide(true)
+            }
+          >
+            Smart Guide
+          </li>
+
         </ul>
 
-
-        <button className="login-btn">
-          Login
-        </button>
+        <div className="navbar-account">
+          {currentUser ? (
+            <>
+              <span className="user-greeting">
+                Hi, {currentUser.name?.split(" ")[0]}
+              </span>
+              <button className="login-btn logged-in" onClick={handleLogout}>
+                Logout
+              </button>
+            </>
+          ) : (
+            <button
+              className="login-btn"
+              onClick={() => {
+                setAuthMode("login");
+                resetAuthForm();
+                setShowLogin(true);
+              }}
+            >
+              Login
+            </button>
+          )}
+        </div>
 
       </nav>
 
 
-      {/* ================= HERO ================= */}
+      {/* ======================================================
+          HERO (CINEMATIC BACKGROUND VIDEO & ENGAGING UI)
+      ====================================================== */}
 
-      <section className="hero">
+      <section className="hero has-video">
+
+        {/* Ambient Cinematic Background Video */}
+        <video
+          ref={heroVideoRef}
+          className="hero-bg-video"
+          autoPlay
+          loop
+          muted
+          playsInline
+          src="/bgvid.mp4"
+        />
+
+        {/* Dark Cinematic Glass Overlay for contrast and readability */}
+        <div className="hero-video-overlay" aria-hidden="true" />
+
+        {/* Floating ambient glow accents */}
+        <div className="hero-ambient-glow glow-1" aria-hidden="true" />
+        <div className="hero-ambient-glow glow-2" aria-hidden="true" />
 
         <div className="hero-text">
 
-          <div className="badge">
-            ✨ AI-POWERED TRAVEL COMPANION
-          </div>
-
+          <span className="badge">
+            <span className="badge-sparkle">✨</span> AI-POWERED TRAVEL COMPANION
+          </span>
 
           <h1>
-
             Your journey.
-
             <br />
-
-            <span>
-              Our intelligence.
-            </span>
-
+            <span>Our intelligence.</span>
           </h1>
-
 
           <p>
             Plan smarter, travel safer and
-            discover more. Yatra AI creates
-            personalized journeys while helping
-            you stay protected from travel scams.
+            discover more with Yatra AI.
           </p>
 
+          {/* Quick Trending Destinations for Instant Engagement */}
+          <div className="hero-trending">
+            <span className="trending-label">🔥 Trending Now:</span>
+            <div className="trending-chips">
+              {["Goa 🏖️", "Manali 🏔️", "Kerala 🌴", "Jaipur 🏰", "Rishikesh 🧘"].map(dest => (
+                <button
+                  key={dest}
+                  type="button"
+                  className="trending-chip"
+                  onClick={() => openPlanner(dest.split(" ")[0])}
+                  title={`Plan your journey to ${dest.split(" ")[0]}`}
+                >
+                  {dest}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div className="hero-buttons">
 
             <button
               className="plan-btn"
               onClick={() =>
-                setShowPlanner(true)
+                openPlanner()
               }
             >
-
-              Plan My Journey
-
-              <span>
-                →
-              </span>
-
+              Plan My Journey <span className="btn-arrow">→</span>
             </button>
-
 
             <button
               className="explore-btn"
@@ -1181,36 +1395,30 @@ function App() {
 
           </div>
 
-
           <div className="hero-stats">
 
             <div>
               <strong>
-                36+
+                {destinations.length}+
               </strong>
-
               <span>
                 Destinations
               </span>
             </div>
 
-
             <div>
               <strong>
                 AI
               </strong>
-
               <span>
                 Personalized Plans
               </span>
             </div>
 
-
             <div>
               <strong>
                 24/7
               </strong>
-
               <span>
                 Safety Support
               </span>
@@ -1221,153 +1429,116 @@ function App() {
         </div>
 
 
-        {/* HERO CARD */}
-
         <div className="hero-card">
 
-          <div className="hero-card-glow" />
-
+          <div className="hero-card-glow" aria-hidden="true" />
 
           <div className="hero-card-header">
-
             <span className="mini-badge">
               YATRA AI
             </span>
 
             <span className="online-dot">
-              ● AI Ready
+              <span className="live-indicator" /> AI Ready
             </span>
-
           </div>
 
-
           <h2>
-
             Where will you
-
             <br />
-
-            <span>
-              go next?
-            </span>
-
+            <span>go next?</span>
           </h2>
-
 
           <p>
             Tell us your dream destination
             and let AI build your journey.
           </p>
 
-
-          <div className="trip-input">
-
-            <span>
-              📍
-            </span>
-
+          <div className="trip-input" onClick={() => openPlanner()}>
+            <span>📍</span>
             <div>
-
               <small>
                 DESTINATION
               </small>
-
               <strong>
-                Where do you want to go?
+                Choose your destination
               </strong>
-
             </div>
-
           </div>
 
-
-          <div className="trip-input">
-
-            <span>
-              📅
-            </span>
-
+          <div className="trip-input" onClick={() => openPlanner()}>
+            <span>📅</span>
             <div>
-
               <small>
                 TRAVEL DATES
               </small>
-
               <strong>
                 Select your dates
               </strong>
-
             </div>
-
           </div>
 
-
-          <div className="trip-input">
-
-            <span>
-              👥
-            </span>
-
+          <div className="trip-input" onClick={() => openPlanner()}>
+            <span>👥</span>
             <div>
-
               <small>
                 TRAVELERS
               </small>
-
               <strong>
                 2 travelers
               </strong>
-
             </div>
-
           </div>
-
 
           <button
             className="card-plan-btn"
             onClick={() =>
-              setShowPlanner(true)
+              openPlanner()
             }
           >
-
-            Start Planning
-
-            <span>
-              →
-            </span>
-
+            Start Planning <span className="btn-arrow">→</span>
           </button>
 
         </div>
 
+        {/* Ambient Video Control Pill */}
+        <button
+          type="button"
+          className="video-control-pill"
+          onClick={toggleVideoPlay}
+          title={isVideoPlaying ? "Pause ambient video" : "Play ambient video"}
+          aria-label={isVideoPlaying ? "Pause ambient video" : "Play ambient video"}
+        >
+          <span className="video-control-icon">{isVideoPlaying ? "⏸" : "▶"}</span>
+          <span className="video-control-text">{isVideoPlaying ? "Ambient Video" : "Video Paused"}</span>
+        </button>
+
       </section>
 
 
-      {/* ================= FEATURES ================= */}
+      {/* ======================================================
+          FEATURES
+      ====================================================== */}
 
       <section className="features">
 
+        {/* Ambient colorful glow blobs */}
+        <div className="features-ambient-glow feat-glow-1" aria-hidden="true" />
+        <div className="features-ambient-glow feat-glow-2" aria-hidden="true" />
+
         <div className="section-heading">
 
-          <span className="section-label">
-            WHY YATRA AI
+          <span className="section-label colorful-label">
+            ✨ WHY YATRA AI
           </span>
 
-
           <h2>
-
             Everything you need to
-
-            <span>
-              {" "}travel smarter.
-            </span>
-
+            <span className="gradient-text"> travel smarter.</span>
           </h2>
 
-
           <p>
-            One intelligent platform for your
-            entire journey.
+            Experience next-generation AI travel planning with curated local intelligence.
           </p>
 
         </div>
@@ -1376,128 +1547,130 @@ function App() {
         <div className="feature-grid">
 
           <div
-            className="feature-card"
+            className="feature-card card-cyan"
             onClick={() =>
-              setShowPlanner(true)
+              openPlanner()
             }
           >
-
-            <div className="feature-icon">
-              🤖
+            <div className="card-top-row">
+              <div className="feature-icon icon-cyan">
+                🤖
+              </div>
+              <span className="card-fun-badge badge-cyan">AI Magic ✨</span>
+              <span className="feature-number">
+                01
+              </span>
             </div>
-
-            <span className="feature-number">
-              01
-            </span>
 
             <h3>
               AI Trip Planner
             </h3>
 
             <p>
-              Get personalized itineraries
-              based on your interests,
-              budget and time.
+              Personalized itineraries
+              based on dates, interests,
+              travelers and budget.
             </p>
 
-            <span className="feature-arrow">
-              Explore feature →
-            </span>
-
+            <div className="card-action-cue">
+              <span>Plan your trip</span>
+              <span className="action-arrow">→</span>
+            </div>
           </div>
 
 
           <div
-            className="feature-card"
-            onClick={() =>
-              setShowScamChecker(true)
-            }
+            className="feature-card card-emerald"
+            onClick={loadSafety}
           >
-
-            <div className="feature-icon">
-              🛡️
+            <div className="card-top-row">
+              <div className="feature-icon icon-emerald">
+                🛡️
+              </div>
+              <span className="card-fun-badge badge-emerald">Safe Travel 🛡️</span>
+              <span className="feature-number">
+                02
+              </span>
             </div>
-
-            <span className="feature-number">
-              02
-            </span>
 
             <h3>
               Travel Safety
             </h3>
 
             <p>
-              Make smarter decisions and
-              receive practical travel
-              safety recommendations.
+              Best travel time, crowd
+              estimates, safety advice
+              and scam detection.
             </p>
 
-            <span className="feature-arrow">
-              Stay protected →
-            </span>
-
+            <div className="card-action-cue">
+              <span>Check safety</span>
+              <span className="action-arrow">→</span>
+            </div>
           </div>
 
 
           <div
-            className="feature-card"
-            onClick={() =>
-              setShowScamChecker(true)
-            }
+            className="feature-card card-amber"
+            onClick={loadLocalInsights}
           >
-
-            <div className="feature-icon">
-              🚨
+            <div className="card-top-row">
+              <div className="feature-icon icon-amber">
+                🍛
+              </div>
+              <span className="card-fun-badge badge-amber">Local Vibe 🌶️</span>
+              <span className="feature-number">
+                03
+              </span>
             </div>
-
-            <span className="feature-number">
-              03
-            </span>
-
-            <h3>
-              Scam Detection
-            </h3>
-
-            <p>
-              Analyze suspicious offers,
-              messages and prices before
-              you make a payment.
-            </p>
-
-            <span className="feature-arrow">
-              Check a situation →
-            </span>
-
-          </div>
-
-
-          <div
-            className="feature-card"
-            onClick={goExplore}
-          >
-
-            <div className="feature-icon">
-              🗺️
-            </div>
-
-            <span className="feature-number">
-              04
-            </span>
 
             <h3>
               Local Insights
             </h3>
 
             <p>
-              Discover beautiful destinations,
-              culture and experiences across
-              India.
+              Discover local food,
+              souvenirs, shopping areas
+              and budget stay areas.
             </p>
 
-            <span className="feature-arrow">
-              Explore India →
-            </span>
+            <div className="card-action-cue">
+              <span>Explore food & stays</span>
+              <span className="action-arrow">→</span>
+            </div>
+          </div>
 
+
+          <div
+            className="feature-card card-purple"
+            onClick={() =>
+              setShowSmartGuide(true)
+            }
+          >
+            <div className="card-top-row">
+              <div className="feature-icon icon-purple">
+                📷
+              </div>
+              <span className="card-fun-badge badge-purple">AR Vision 📸</span>
+              <span className="feature-number">
+                04
+              </span>
+            </div>
+
+            <h3>
+              Smart Tourist Guide
+            </h3>
+
+            <p>
+              Point your camera toward
+              a place and use Yatra AI
+              as your digital guide.
+            </p>
+
+            <div className="card-action-cue">
+              <span>Launch AR guide</span>
+              <span className="action-arrow">→</span>
+            </div>
           </div>
 
         </div>
@@ -1505,7 +1678,9 @@ function App() {
       </section>
 
 
-      {/* ================= EXPLORE ================= */}
+      {/* ======================================================
+          EXPLORE
+      ====================================================== */}
 
       <section
         className="explore-section"
@@ -1516,28 +1691,20 @@ function App() {
 
           <div>
 
-            <span className="section-label">
-              DISCOVER INDIA
+            <span className="section-label colorful-label">
+              🌈 DISCOVER INDIA
             </span>
 
             <h2>
-
               Explore your
-
-              <span>
-                {" "}next escape.
-              </span>
-
+              <span className="gradient-text"> next escape.</span>
             </h2>
 
             <p>
-              From Himalayan peaks to tropical
-              beaches, discover destinations
-              worth adding to your journey.
+              From the snowcapped peaks of Ladakh to the sunny beaches of Goa and ancient temples of Varanasi.
             </p>
 
           </div>
-
 
           <div className="destination-count">
 
@@ -1546,7 +1713,7 @@ function App() {
             </strong>
 
             <span>
-              destinations
+              Destinations
             </span>
 
           </div>
@@ -1554,36 +1721,30 @@ function App() {
         </div>
 
 
-        {/* SEARCH + FILTER */}
-
         <div className="explore-controls">
 
           <div className="search-box">
 
-            <span>
-              ⌕
-            </span>
+            <span>🔎</span>
 
             <input
-              type="text"
-              placeholder="Search destinations..."
               value={search}
-              onChange={(e) =>
-                setSearch(e.target.value)
+              onChange={e =>
+                setSearch(
+                  e.target.value
+                )
               }
+              placeholder="Search destinations, states, vibes..."
             />
 
             {search && (
-
               <button
                 onClick={() =>
                   setSearch("")
                 }
-                aria-label="Clear search"
               >
                 ×
               </button>
-
             )}
 
           </div>
@@ -1592,14 +1753,15 @@ function App() {
           <div className="category-list">
 
             {categories.map(
-              (category) => (
+              category => (
 
                 <button
                   key={category}
                   className={
-                    selectedCategory === category
-                      ? "category-btn active"
-                      : "category-btn"
+                    selectedCategory ===
+                    category
+                      ? `category-btn active cat-${category.toLowerCase()}`
+                      : `category-btn cat-${category.toLowerCase()}`
                   }
                   onClick={() =>
                     setSelectedCategory(
@@ -1607,9 +1769,8 @@ function App() {
                     )
                   }
                 >
-
-                  {category}
-
+                  <span className="cat-icon">{categoryIcons[category] || "✨"}</span>
+                  <span className="cat-text">{category}</span>
                 </button>
 
               )
@@ -1620,31 +1781,46 @@ function App() {
         </div>
 
 
-        {/* DESTINATION GRID */}
-
         <div className="destination-grid">
 
           {filteredDestinations.map(
-            (destination) => (
+            destination => (
 
               <div
-                className="destination-card"
+                className={`destination-card card-${destination.category.toLowerCase()}`}
                 key={destination.name}
               >
 
                 <div className="destination-image">
 
-                  {images[destination.name] ? (
+                  {images[
+                    destination.name
+                  ] ? (
 
                     <img
                       src={
-                        images[destination.name]
-                      }
-                      alt={`${destination.name}, ${destination.state}`}
-                      loading="lazy"
-                      onError={() =>
-                        handleImageError(
+                        images[
                           destination.name
+                        ]
+                      }
+                      alt={
+                        destination.name
+                      }
+                      onError={() =>
+                        setImages(
+                          previous => {
+
+                            const copy = {
+                              ...previous,
+                            };
+
+                            delete copy[
+                              destination.name
+                            ];
+
+                            return copy;
+
+                          }
                         )
                       }
                     />
@@ -1653,78 +1829,67 @@ function App() {
 
                     <div className="image-loading">
 
-                      <div>
+                      <span>
+                        {destination.emoji}
+                      </span>
 
-                        <span>
-                          {destination.emoji}
-                        </span>
-
-                        <small>
-                          Discover{" "}
-                          {destination.name}
-                        </small>
-
-                      </div>
+                      <small>
+                        Discover{" "}
+                        {destination.name}
+                      </small>
 
                     </div>
 
                   )}
 
-
                   <div className="image-overlay" />
 
+                  {/* Colorful Category Tag with Emoji */}
+                  <span className={`destination-tag tag-${destination.category.toLowerCase()}`}>
+                    {destination.emoji} {destination.category}
+                  </span>
 
-                  <div className="destination-tag">
-                    {destination.category}
-                  </div>
-
-
-                  <div className="destination-emoji">
-                    {destination.emoji}
-                  </div>
+                  {/* Interactive Heart Wishlist Button */}
+                  <button
+                    type="button"
+                    className={`destination-like-btn ${likedDestinations[destination.name] ? "liked" : ""}`}
+                    onClick={(e) => toggleLike(e, destination.name)}
+                    title={likedDestinations[destination.name] ? "Saved to wishlist" : "Add to wishlist"}
+                    aria-label="Save destination"
+                  >
+                    {likedDestinations[destination.name] ? "❤️" : "🤍"}
+                  </button>
 
                 </div>
 
 
                 <div className="destination-content">
 
-                  <div className="destination-title">
-
-                    <div>
-
-                      <h3>
-                        {destination.name}
-                      </h3>
-
-                      <span>
-                        📍 {destination.state}
-                      </span>
-
-                    </div>
-
+                  <div className="destination-title-row">
+                    <h3>
+                      {destination.name}
+                    </h3>
+                    <span className="destination-emoji-pill">{destination.emoji}</span>
                   </div>
 
+                  <span className="destination-state">
+                    📍 {destination.state}
+                  </span>
 
                   <p>
                     {destination.description}
                   </p>
 
-
                   <button
                     className="destination-btn"
                     onClick={() =>
-                      openPlannerForDestination(
+                      openPlanner(
                         destination.name
                       )
                     }
                   >
-
-                    Plan this trip
-
-                    <span>
-                      →
-                    </span>
-
+                    <span>Plan this trip</span>
+                    <span className="btn-arrow">→</span>
                   </button>
 
                 </div>
@@ -1736,50 +1901,12 @@ function App() {
 
         </div>
 
-
-        {/* EMPTY STATE */}
-
-        {filteredDestinations.length === 0 && (
-
-          <div className="empty-explore">
-
-            <div>
-              🧭
-            </div>
-
-            <h3>
-              No destinations found
-            </h3>
-
-            <p>
-              Try searching for another
-              Indian destination.
-            </p>
-
-            <button
-              onClick={() => {
-
-                setSearch("");
-
-                setSelectedCategory(
-                  "All"
-                );
-
-              }}
-            >
-              Show all destinations
-            </button>
-
-          </div>
-
-        )}
-
       </section>
 
 
-      {/* ============================================================
+      {/* ======================================================
           PLANNER MODAL
-      ============================================================ */}
+      ====================================================== */}
 
       {showPlanner && (
 
@@ -1796,21 +1923,18 @@ function App() {
               ✕
             </button>
 
-
-            <div className="ai-badge">
+            <span className="ai-badge">
               ✨ YATRA AI PLANNER
-            </div>
-
+            </span>
 
             <h2>
               Plan Your Journey
             </h2>
 
-
             <p className="modal-subtitle">
-              Tell Yatra AI about your trip
-              and we'll create a personalized
-              experience.
+              Tell Yatra AI about your
+              trip and we'll build a
+              personalized itinerary.
             </p>
 
 
@@ -1819,15 +1943,17 @@ function App() {
             >
 
               <label>
-
                 Destination
 
                 <input
-                  type="text"
                   name="destination"
-                  placeholder="e.g. Varanasi, Goa, Leh"
-                  value={trip.destination}
-                  onChange={handleChange}
+                  value={
+                    trip.destination
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="e.g. Goa"
                   required
                 />
 
@@ -1837,14 +1963,17 @@ function App() {
               <div className="date-row">
 
                 <label>
-
                   Start Date
 
                   <input
                     type="date"
                     name="startDate"
-                    value={trip.startDate}
-                    onChange={handleChange}
+                    value={
+                      trip.startDate
+                    }
+                    onChange={
+                      handleChange
+                    }
                     required
                   />
 
@@ -1852,14 +1981,17 @@ function App() {
 
 
                 <label>
-
                   End Date
 
                   <input
                     type="date"
                     name="endDate"
-                    value={trip.endDate}
-                    onChange={handleChange}
+                    value={
+                      trip.endDate
+                    }
+                    onChange={
+                      handleChange
+                    }
                     required
                   />
 
@@ -1869,16 +2001,19 @@ function App() {
 
 
               <label>
-
-                Number of Travelers
+                Travelers
 
                 <input
                   type="number"
                   name="travelers"
                   min="1"
                   max="20"
-                  value={trip.travelers}
-                  onChange={handleChange}
+                  value={
+                    trip.travelers
+                  }
+                  onChange={
+                    handleChange
+                  }
                   required
                 />
 
@@ -1886,18 +2021,21 @@ function App() {
 
 
               <label>
-
                 Budget
 
                 <select
                   name="budget"
-                  value={trip.budget}
-                  onChange={handleChange}
+                  value={
+                    trip.budget
+                  }
+                  onChange={
+                    handleChange
+                  }
                   required
                 >
 
                   <option value="">
-                    Select your budget
+                    Select budget
                   </option>
 
                   <option value="budget">
@@ -1922,15 +2060,17 @@ function App() {
 
 
               <label>
-
-                What are you interested in?
+                Interests
 
                 <input
-                  type="text"
                   name="interests"
-                  placeholder="Food, beaches, culture, adventure..."
-                  value={trip.interests}
-                  onChange={handleChange}
+                  value={
+                    trip.interests
+                  }
+                  onChange={
+                    handleChange
+                  }
+                  placeholder="Food, culture, adventure..."
                 />
 
               </label>
@@ -1938,7 +2078,6 @@ function App() {
 
               <button
                 className="generate-btn"
-                type="submit"
                 disabled={loading}
               >
 
@@ -1957,9 +2096,9 @@ function App() {
       )}
 
 
-      {/* ============================================================
-          ITINERARY MODAL
-      ============================================================ */}
+      {/* ======================================================
+          ITINERARY
+      ====================================================== */}
 
       {showItinerary && (
 
@@ -1976,35 +2115,25 @@ function App() {
               ✕
             </button>
 
-
-            <div className="ai-badge">
+            <span className="ai-badge">
               ✨ YATRA AI
-            </div>
-
+            </span>
 
             <h2>
               Your Personalized Journey
             </h2>
 
-
             <p className="itinerary-intro">
-
-              Here's a smart travel plan created
-              for your trip to{" "}
-
+              Smart travel plan for{" "}
               <strong>
                 {trip.destination}
-              </strong>.
-
+              </strong>
             </p>
 
-
-            {/* SUMMARY */}
 
             <div className="trip-summary">
 
               <div>
-
                 <span>
                   📍 Destination
                 </span>
@@ -2012,12 +2141,9 @@ function App() {
                 <strong>
                   {trip.destination}
                 </strong>
-
               </div>
 
-
               <div>
-
                 <span>
                   👥 Travelers
                 </span>
@@ -2025,69 +2151,42 @@ function App() {
                 <strong>
                   {trip.travelers}
                 </strong>
-
               </div>
 
-
               <div>
-
                 <span>
-                  💰 Budget
+                  📅 Dates
                 </span>
 
                 <strong>
-
-                  {trip.budget ===
-                    "budget"
-                    ? "Budget"
-                    : trip.budget ===
-                      "moderate"
-                    ? "Moderate"
-                    : trip.budget ===
-                      "premium"
-                    ? "Premium"
-                    : "Luxury"}
-
+                  {trip.startDate}
+                  {" → "}
+                  {trip.endDate}
                 </strong>
-
               </div>
 
             </div>
 
 
-            {/* BUDGET */}
-
             {budgetBreakdown && (
 
               <div className="budget-card">
 
-                <div className="budget-header">
+                <span className="section-label">
+                  SMART ESTIMATE
+                </span>
 
-                  <div>
+                <h3>
+                  💰 Trip Budget
+                </h3>
 
-                    <span className="section-label">
-                      SMART ESTIMATE
-                    </span>
-
-                    <h3>
-                      💰 Trip Budget
-                    </h3>
-
-                  </div>
-
-
-                  <div className="budget-total-small">
-
-                    ₹
-                    {Number(
-                      budgetBreakdown.total ||
-                        0
-                    ).toLocaleString(
-                      "en-IN"
-                    )}
-
-                  </div>
-
+                <div className="budget-total-small">
+                  ₹
+                  {Number(
+                    budgetBreakdown.total
+                  ).toLocaleString(
+                    "en-IN"
+                  )}
                 </div>
 
 
@@ -2125,14 +2224,12 @@ function App() {
                       </span>
 
                       <strong>
-
                         ₹
                         {Number(
                           value || 0
                         ).toLocaleString(
                           "en-IN"
                         )}
-
                       </strong>
 
                     </div>
@@ -2140,81 +2237,40 @@ function App() {
                   )
                 )}
 
-
                 <div className="budget-divider" />
-
 
                 <div className="budget-total">
 
                   <span>
-                    💰 Estimated Total
+                    Estimated Total
                   </span>
 
                   <strong>
-
                     ₹
                     {Number(
-                      budgetBreakdown.total ||
-                        0
+                      budgetBreakdown.total
                     ).toLocaleString(
                       "en-IN"
                     )}
-
                   </strong>
 
                 </div>
-
-
-                <p className="budget-note">
-
-                  Approximate estimate based on
-                  your selected budget, trip duration
-                  and number of travelers.
-
-                </p>
 
               </div>
 
             )}
 
 
-            {/* ======================================================
-                YATRA MAP
-            ====================================================== */}
-
             <div className="trip-map-card">
 
-              <div className="trip-map-header">
-
-                <div>
-
-                  <span className="section-label">
-                    📍 YOUR DESTINATION
-                  </span>
-
-                  <h3>
-                    🗺️ Explore{" "}
-                    {trip.destination}
-                  </h3>
-
-                  <p>
-                    View your destination on the
-                    map and get a visual feel for
-                    your journey.
-                  </p>
-
-                </div>
-
-
-                <div className="map-location-badge">
-
-                  📍{" "}
-                  {trip.destination}
-
-                </div>
-
+              <div className="section-label">
+                📍 DESTINATION MAP
               </div>
 
+              <h3>
+                🗺️ Explore{" "}
+                {trip.destination}
+              </h3>
 
               <YatraMap
                 destination={
@@ -2225,200 +2281,144 @@ function App() {
             </div>
 
 
-            {/* ITINERARY */}
+            {/* ==================================================
+                DAY CARDS
+            ================================================== */}
 
             <div className="ai-itinerary">
 
-              <div className="itinerary-header">
+              <span className="section-label">
+                ✨ YOUR AI TRAVEL PLAN
+              </span>
 
-                <span className="section-label">
-                  ✨ YOUR AI TRAVEL PLAN
-                </span>
-
-                <h3>
-                  🗺️ Day-by-Day Itinerary
-                </h3>
-
-                <p>
-                  A personalized journey designed
-                  around your destination,
-                  interests and budget.
-                </p>
-
-              </div>
+              <h3>
+                🗺️ Day-by-Day Itinerary
+              </h3>
 
 
               <div className="day-cards">
 
-                {itineraryDays.length > 0 ? (
+                {itineraryDays.length > 0
+                  ? itineraryDays.map(
+                      day => (
 
-                  itineraryDays.map(
-                    (day, index) => (
+                        <div
+                          className="day-card"
+                          key={`day-${day.number}`}
+                        >
 
-                      <div
-                        className="day-card"
-                        key={index}
-                      >
+                          <div className="day-card-top">
 
-                        <div className="day-card-top">
+                            <div className="day-icon">
+                              {day.number === 1
+                                ? "🌅"
+                                : day.number === 2
+                                ? "🌴"
+                                : day.number === 3
+                                ? "🏛️"
+                                : day.number === 4
+                                ? "🍜"
+                                : "✨"}
+                            </div>
 
-                          <div className="day-icon">
+                            <div>
 
-                            {index === 0
-                              ? "🌅"
-                              : index === 1
-                              ? "🌴"
-                              : index === 2
-                              ? "🏛️"
-                              : index === 3
-                              ? "🍜"
-                              : index === 4
-                              ? "🌄"
-                              : "✨"}
+                              <span className="day-label">
+                                DAY {day.number}
+                              </span>
 
-                          </div>
+                              <h4>
+                                {day.title}
+                              </h4>
 
-
-                          <div>
-
-                            <span className="day-label">
-                              DAY{" "}
-                              {index + 1}
-                            </span>
-
-                            <h4>
-                              {day.title}
-                            </h4>
+                            </div>
 
                           </div>
 
-                        </div>
 
+                          <div className="day-content">
 
-                        <div className="day-content">
+                            {day.content
+                              .split("\n")
+                              .filter(
+                                line =>
+                                  line.trim()
+                              )
+                              .map(
+                                (
+                                  line,
+                                  index
+                                ) => {
 
-                          {day.content
-                            .split("\n")
-                            .filter(
-                              (line) =>
-                                line.trim()
-                            )
-                            .map(
-                              (
-                                line,
-                                lineIndex
-                              ) => {
+                                  const clean =
+                                    line
+                                      .replace(
+                                        /^\s*[-•*]\s*/,
+                                        ""
+                                      )
+                                      .replace(
+                                        /\*\*/g,
+                                        ""
+                                      )
+                                      .trim();
 
-                                const cleanLine =
-                                  line
-                                    .replace(
-                                      /^\s*[-•*]\s*/,
-                                      ""
-                                    )
-                                    .replace(
-                                      /\*\*/g,
-                                      ""
-                                    )
-                                    .trim();
+                                  const heading =
+                                    /^(Morning|Afternoon|Evening|Food|Transportation|Estimated Expenses|Safety|Local Experience)\s*:/i
+                                      .test(
+                                        clean
+                                      );
 
+                                  return (
 
-                                const isBullet =
-                                  /^[-•*]/.test(
-                                    line.trim()
-                                  );
-
-
-                                const isHeading =
-                                  cleanLine.endsWith(
-                                    ":"
-                                  );
-
-
-                                return (
-
-                                  <div
-                                    className="itinerary-line"
-                                    key={
-                                      lineIndex
-                                    }
-                                  >
-
-                                    {isBullet && (
-
-                                      <span className="bullet">
-                                        ✦
-                                      </span>
-
-                                    )}
-
-
-                                    <span
+                                    <div
                                       className={
-                                        isHeading
-                                          ? "itinerary-subheading"
-                                          : ""
+                                        heading
+                                          ? "itinerary-line itinerary-heading-line"
+                                          : "itinerary-line"
+                                      }
+                                      key={
+                                        index
                                       }
                                     >
-                                      {cleanLine}
-                                    </span>
 
-                                  </div>
+                                      {!heading && (
+                                        <span className="bullet">
+                                          ✦
+                                        </span>
+                                      )}
 
-                                );
+                                      <span>
+                                        {clean}
+                                      </span>
 
-                              }
-                            )}
+                                    </div>
+
+                                  );
+
+                                }
+                              )}
+
+                          </div>
 
                         </div>
+
+                      )
+                    )
+                  : (
+
+                    <div className="day-card">
+
+                      <div className="day-content">
+
+                        <pre>
+                          {itinerary}
+                        </pre>
 
                       </div>
 
-                    )
-
-                  )
-
-                ) : (
-
-                  <div className="day-card">
-
-                    <div className="day-content">
-
-                      <pre>
-                        {itinerary}
-                      </pre>
-
                     </div>
 
-                  </div>
-
-                )}
-
-              </div>
-
-            </div>
-
-
-            {/* SAFETY */}
-
-            <div className="safety-box">
-
-              <div className="safety-icon">
-                🛡️
-              </div>
-
-              <div>
-
-                <h3>
-                  Yatra Safety Tip
-                </h3>
-
-                <p>
-                  Keep your valuables secure,
-                  verify transportation prices
-                  before travelling, and avoid
-                  making payments to unverified
-                  individuals.
-                </p>
+                  )}
 
               </div>
 
@@ -2430,14 +2430,11 @@ function App() {
               onClick={() => {
 
                 setShowItinerary(false);
-
                 setShowPlanner(true);
 
               }}
             >
-
               ✨ Plan Another Trip
-
             </button>
 
           </div>
@@ -2447,110 +2444,813 @@ function App() {
       )}
 
 
-      {/* ============================================================
-          SCAM CHECKER
-      ============================================================ */}
+      {/* ======================================================
+          TRAVEL SAFETY + SCAM DETECTION
+      ====================================================== */}
 
-      {showScamChecker && (
+      {showSafety && (
 
         <div className="modal-overlay">
 
-          <div className="planner-modal">
+          <div className="large-modal">
+
+            <button
+              className="close-btn"
+              onClick={() =>
+                setShowSafety(false)
+              }
+            >
+              ✕
+            </button>
+
+            <span className="ai-badge">
+              🛡️ YATRA AI SAFETY
+            </span>
+
+            <h2>
+              Travel Safety
+            </h2>
+
+            <p className="modal-subtitle">
+              Stay informed before and
+              during your journey.
+            </p>
+
+
+            {safetyLoading ? (
+
+              <div className="loading-state">
+                🤖 Yatra AI is checking
+                travel conditions...
+              </div>
+
+            ) : safetyData ? (
+
+              <>
+
+                {/* BEST TIME */}
+
+                <div className="safety-card-grid">
+
+                  <div className="safety-feature-card">
+
+                    <div className="feature-icon">
+                      📅
+                    </div>
+
+                    <span className="section-label">
+                      BEST TIME TO VISIT
+                    </span>
+
+                    <h3>
+                      {safetyData.bestTime}
+                    </h3>
+
+                    <p>
+                      {safetyData.bestTimeReason}
+                    </p>
+
+                  </div>
+
+
+                  {/* CROWD */}
+
+                  <div className="safety-feature-card">
+
+                    <div className="feature-icon">
+                      👥
+                    </div>
+
+                    <span className="section-label">
+                      CROWD FLOW
+                    </span>
+
+                    <h3>
+                      {safetyData.crowdLevel}
+                    </h3>
+
+                    <p>
+                      {safetyData.crowdExplanation}
+                    </p>
+
+                  </div>
+
+                </div>
+
+
+                {/* SAFETY TIPS */}
+
+                <div className="safety-section">
+
+                  <span className="section-label">
+                    🛡️ SAFETY TIPS
+                  </span>
+
+                  <div className="safety-tip-grid">
+
+                    {safetyData
+                      .safetyTips
+                      ?.map(
+                        (tip, index) => (
+
+                          <div
+                            className="safety-tip-card"
+                            key={index}
+                          >
+                            <span>
+                              ✓
+                            </span>
+
+                            <p>
+                              {tip}
+                            </p>
+
+                          </div>
+
+                        )
+                      )}
+
+                  </div>
+
+                </div>
+
+
+                {/* SCAM DETECTION */}
+
+                <div className="scam-section">
+
+                  <span className="section-label">
+                    🚨 SCAM DETECTION
+                  </span>
+
+                  <h3>
+                    Check a suspicious
+                    travel situation
+                  </h3>
+
+                  <p>
+                    Enter a taxi quote,
+                    hotel offer, message,
+                    tour package or payment
+                    request and Yatra AI
+                    will assess the warning
+                    signs.
+                  </p>
+
+
+                  <textarea
+                    value={scamText}
+                    onChange={e =>
+                      setScamText(
+                        e.target.value
+                      )
+                    }
+                    placeholder="Example: A taxi driver is asking ₹3,000 for a short airport ride..."
+                    rows={6}
+                  />
+
+
+                  <button
+                    className="generate-btn"
+                    onClick={
+                      handleScamCheck
+                    }
+                    disabled={
+                      scamLoading
+                    }
+                  >
+                    {scamLoading
+                      ? "🤖 Checking..."
+                      : "🔍 Check for Scam"}
+                  </button>
+
+
+                  {scamResult && (
+
+                    <div className="scam-result-card">
+
+                      <span className="section-label">
+                        AI SAFETY ANALYSIS
+                      </span>
+
+                      <pre>
+                        {scamResult}
+                      </pre>
+
+                    </div>
+
+                  )}
+
+                </div>
+
+              </>
+
+            ) : (
+
+              <div className="empty-state">
+                <p>
+                  Safety information
+                  could not be loaded.
+                </p>
+              </div>
+
+            )}
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* ======================================================
+          LOCAL INSIGHTS
+      ====================================================== */}
+
+      {showLocalInsights && (
+
+        <div className="modal-overlay">
+
+          <div className="large-modal">
+
+            <button
+              className="close-btn"
+              onClick={() =>
+                setShowLocalInsights(false)
+              }
+            >
+              ✕
+            </button>
+
+            <span className="ai-badge">
+              🍛 YATRA AI LOCAL INSIGHTS
+            </span>
+
+            <h2>
+              Discover{" "}
+              {trip.destination}
+            </h2>
+
+            <p className="modal-subtitle">
+              Go beyond tourist attractions.
+              Discover what makes the
+              locality special.
+            </p>
+
+
+            {localLoading ? (
+
+              <div className="loading-state">
+                🍛 Yatra AI is discovering
+                the locality...
+              </div>
+
+            ) : localInsights ? (
+
+              <>
+
+                {!localInsights.verified && (
+
+                  <div className="info-warning">
+                    ℹ️ Verified local data is
+                    currently limited for this
+                    destination.
+                  </div>
+
+                )}
+
+
+                {/* BEST TIME */}
+
+                <div className="local-highlight">
+
+                  <div className="feature-icon">
+                    📅
+                  </div>
+
+                  <div>
+
+                    <span className="section-label">
+                      BEST TIME
+                    </span>
+
+                    <h3>
+                      {localInsights.bestTime}
+                    </h3>
+
+                    <p>
+                      {localInsights.bestTimeReason}
+                    </p>
+
+                  </div>
+
+                </div>
+
+
+                {/* FOOD */}
+
+                {localInsights.food
+                  ?.length > 0 && (
+
+                  <section className="local-section">
+
+                    <span className="section-label">
+                      🍛 LOCAL FOOD
+                    </span>
+
+                    <h3>
+                      Must-try food
+                    </h3>
+
+                    <div className="local-grid">
+
+                      {localInsights.food.map(
+                        food => (
+
+                          <div
+                            className="local-card"
+                            key={food.name}
+                          >
+
+                            <div className="local-card-icon">
+                              🍽️
+                            </div>
+
+                            <h4>
+                              {food.name}
+                            </h4>
+
+                            <p>
+                              {food.description}
+                            </p>
+
+                            {food.mustTry && (
+
+                              <span className="must-try">
+                                ⭐ Must Try
+                              </span>
+
+                            )}
+
+                          </div>
+
+                        )
+                      )}
+
+                    </div>
+
+                  </section>
+
+                )}
+
+
+                {/* FOOD AREAS */}
+
+                {localInsights
+                  .foodAreas
+                  ?.length > 0 && (
+
+                  <section className="local-section">
+
+                    <span className="section-label">
+                      📍 FOOD AREAS
+                    </span>
+
+                    <h3>
+                      Where to explore local food
+                    </h3>
+
+                    <div className="local-grid">
+
+                      {localInsights
+                        .foodAreas
+                        .map(area => (
+
+                          <div
+                            className="local-card"
+                            key={area.name}
+                          >
+
+                            <div className="local-card-icon">
+                              📍
+                            </div>
+
+                            <h4>
+                              {area.name}
+                            </h4>
+
+                            <p>
+                              {area.description}
+                            </p>
+
+                          </div>
+
+                        ))}
+
+                    </div>
+
+                  </section>
+
+                )}
+
+
+                {/* FAMOUS FOR */}
+
+                {localInsights
+                  .famousFor
+                  ?.length > 0 && (
+
+                  <section className="local-section">
+
+                    <span className="section-label">
+                      ⭐ LOCAL HIGHLIGHTS
+                    </span>
+
+                    <h3>
+                      What is this place famous for?
+                    </h3>
+
+                    <div className="famous-list">
+
+                      {localInsights
+                        .famousFor
+                        .map(
+                          item => (
+
+                            <div
+                              className="famous-pill"
+                              key={item}
+                            >
+                              ✦ {item}
+                            </div>
+
+                          )
+                        )}
+
+                    </div>
+
+                  </section>
+
+                )}
+
+
+                {/* SOUVENIRS */}
+
+                {localInsights
+                  .souvenirs
+                  ?.length > 0 && (
+
+                  <section className="local-section">
+
+                    <span className="section-label">
+                      🛍️ LOCAL SHOPPING
+                    </span>
+
+                    <h3>
+                      Souvenirs worth taking home
+                    </h3>
+
+                    <div className="local-grid">
+
+                      {localInsights
+                        .souvenirs
+                        .map(item => (
+
+                          <div
+                            className="local-card"
+                            key={item.item}
+                          >
+
+                            <div className="local-card-icon">
+                              🛍️
+                            </div>
+
+                            <h4>
+                              {item.item}
+                            </h4>
+
+                            <p>
+                              {item.description}
+                            </p>
+
+                            <div className="buy-box">
+
+                              <strong>
+                                Where to buy
+                              </strong>
+
+                              <span>
+                                {item.whereToBuy}
+                              </span>
+
+                            </div>
+
+                          </div>
+
+                        ))}
+
+                    </div>
+
+                  </section>
+
+                )}
+
+
+                {/* STAYS */}
+
+                {localInsights
+                  .stays
+                  ?.length > 0 && (
+
+                  <section className="local-section">
+
+                    <span className="section-label">
+                      🏨 STAY SMART
+                    </span>
+
+                    <h3>
+                      Budget-friendly stay areas
+                    </h3>
+
+                    <div className="local-grid">
+
+                      {localInsights
+                        .stays
+                        .map(stay => (
+
+                          <div
+                            className="local-card hotel-card"
+                            key={stay.area}
+                          >
+
+                            <div className="local-card-icon">
+                              🏨
+                            </div>
+
+                            <h4>
+                              {stay.area}
+                            </h4>
+
+                            <p>
+                              {stay.recommendation}
+                            </p>
+
+                            <small>
+                              Compare recent
+                              reviews and current
+                              prices before booking.
+                            </small>
+
+                          </div>
+
+                        ))}
+
+                    </div>
+
+                  </section>
+
+                )}
+
+
+                {/* LOCAL SAFETY */}
+
+                {localInsights
+                  .safety
+                  ?.length > 0 && (
+
+                  <section className="local-section">
+
+                    <span className="section-label">
+                      🛡️ LOCAL TIPS
+                    </span>
+
+                    <div className="safety-tip-grid">
+
+                      {localInsights
+                        .safety
+                        .map(
+                          (tip, index) => (
+
+                            <div
+                              className="safety-tip-card"
+                              key={index}
+                            >
+
+                              <span>
+                                ✓
+                              </span>
+
+                              <p>
+                                {tip}
+                              </p>
+
+                            </div>
+
+                          )
+                        )}
+
+                    </div>
+
+                  </section>
+
+                )}
+
+              </>
+
+            ) : null}
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* ======================================================
+          SMART TOURIST GUIDE
+      ====================================================== */}
+
+      {showSmartGuide && (
+
+        <div className="modal-overlay">
+
+          <div className="large-modal smart-guide-modal">
 
             <button
               className="close-btn"
               onClick={() => {
 
-                setShowScamChecker(false);
+                stopCamera();
 
-                setScamResult("");
-
-                setScamText("");
+                setShowSmartGuide(
+                  false
+                );
 
               }}
             >
               ✕
             </button>
 
-
-            <div className="ai-badge">
-              🚨 YATRA AI SAFETY
-            </div>
-
+            <span className="ai-badge">
+              📷 YATRA AI SMART GUIDE
+            </span>
 
             <h2>
-              🛡️ Travel Scam Detector
+              Your Digital Tourist Guide
             </h2>
 
-
             <p className="modal-subtitle">
-
-              Found a suspicious hotel offer,
-              taxi price, tour package or message?
-              Let Yatra AI analyze it.
-
+              Point your camera toward a
+              landmark or place, then tell
+              Yatra AI what you're looking at.
             </p>
 
 
-            <label>
+            {/* CAMERA */}
 
-              Describe the offer or situation
+            <div className="camera-container">
 
-              <textarea
-                value={scamText}
-                onChange={(e) =>
-                  setScamText(
+              {cameraOn ? (
+
+                <video
+                  className="guide-camera"
+                  autoPlay
+                  playsInline
+                  muted
+                  ref={video => {
+
+                    if (
+                      video &&
+                      videoStream
+                    ) {
+
+                      video.srcObject =
+                        videoStream;
+
+                    }
+
+                  }}
+                />
+
+              ) : (
+
+                <div className="camera-placeholder">
+
+                  <div>
+                    📷
+                  </div>
+
+                  <h3>
+                    Camera Guide
+                  </h3>
+
+                  <p>
+                    Use your phone camera
+                    to look at a landmark.
+                  </p>
+
+                </div>
+
+              )}
+
+              <div className="camera-overlay">
+
+                <div className="camera-frame">
+                  <span />
+                  <span />
+                  <span />
+                  <span />
+                  <div className="scanner-line" />
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div className="camera-buttons">
+
+              {!cameraOn ? (
+
+                <button
+                  className="generate-btn"
+                  onClick={
+                    startCamera
+                  }
+                >
+                  📷 Start Camera
+                </button>
+
+              ) : (
+
+                <button
+                  className="secondary-btn"
+                  onClick={
+                    stopCamera
+                  }
+                >
+                  Stop Camera
+                </button>
+
+              )}
+
+            </div>
+
+
+            <div className="guide-input-card">
+
+              <span className="section-label">
+                📍 WHAT ARE YOU LOOKING AT?
+              </span>
+
+              <input
+                value={guidePlace}
+                onChange={e =>
+                  setGuidePlace(
                     e.target.value
                   )
                 }
-                placeholder="Example: A taxi driver at the airport is asking for ₹3,000 to take me to my hotel. Is this suspicious?"
-                rows="6"
+                placeholder="Example: Victoria Memorial"
               />
 
-            </label>
+              <p>
+                For the current Gemma 3 1B
+                setup, enter the landmark
+                name after pointing the camera.
+                This avoids pretending that a
+                text-only model can reliably
+                recognise arbitrary landmarks
+                from an image.
+              </p>
+
+              <button
+                className="generate-btn"
+                onClick={
+                  generateGuide
+                }
+                disabled={
+                  guideLoading
+                }
+              >
+                {guideLoading
+                  ? "🤖 Preparing guide..."
+                  : "✨ Guide Me"}
+              </button>
+
+            </div>
 
 
-            <button
-              className="generate-btn"
-              onClick={handleScamCheck}
-              disabled={scamLoading}
-            >
+            {guideResult && (
 
-              {scamLoading
-                ? "🤖 Yatra AI is checking..."
-                : "🔍 Check for Scam"}
+              <div className="guide-result">
 
-            </button>
+                <span className="section-label">
+                  🧭 YATRA DIGITAL GUIDE
+                </span>
 
-
-            {scamResult && (
-
-              <div className="ai-itinerary scam-result">
-
-                <div className="itinerary-header">
-
-                  <span className="section-label">
-                    AI SAFETY ANALYSIS
-                  </span>
-
-                  <h3>
-                    🔎 Yatra AI Result
-                  </h3>
-
-                </div>
-
-
-                <div className="day-card">
-
-                  <div className="day-content">
-
-                    <pre>
-                      {scamResult}
-                    </pre>
-
-                  </div>
-
-                </div>
+                <pre>
+                  {guideResult}
+                </pre>
 
               </div>
 
@@ -2562,9 +3262,121 @@ function App() {
 
       )}
 
-    </div>
-  );
-}
+      {/* ======================================================
+          LOGIN / REGISTER MODAL
+      ====================================================== */}
 
+      {showLogin && (
+        <div
+          className="modal-overlay auth-overlay"
+          onClick={e => {
+            if (e.target === e.currentTarget) {
+              setShowLogin(false);
+              resetAuthForm();
+            }
+          }}
+        >
+          <div className="auth-modal">
+            <button
+              className="close-btn"
+              onClick={() => {
+                setShowLogin(false);
+                resetAuthForm();
+              }}
+            >
+              ✕
+            </button>
+
+            <div className="auth-logo">✈️</div>
+            <span className="ai-badge">YATRA AI ACCOUNT</span>
+
+            <h2>
+              {authMode === "login" ? "Welcome back" : "Create your account"}
+            </h2>
+
+            <p className="modal-subtitle">
+              {authMode === "login"
+                ? "Login to continue your journey with Yatra AI."
+                : "Create an account to personalize your Yatra AI experience."}
+            </p>
+
+            <div className="auth-tabs">
+              <button
+                type="button"
+                className={authMode === "login" ? "active" : ""}
+                onClick={() => { setAuthMode("login"); resetAuthForm(); }}
+              >
+                Login
+              </button>
+              <button
+                type="button"
+                className={authMode === "register" ? "active" : ""}
+                onClick={() => { setAuthMode("register"); resetAuthForm(); }}
+              >
+                Sign Up
+              </button>
+            </div>
+
+            <form className="auth-form" onSubmit={handleAuthSubmit}>
+              {authMode === "register" && (
+                <label>
+                  Full Name
+                  <input
+                    type="text"
+                    value={authName}
+                    onChange={e => setAuthName(e.target.value)}
+                    placeholder="Enter your name"
+                    autoComplete="name"
+                    required
+                  />
+                </label>
+              )}
+
+              <label>
+                Email Address
+                <input
+                  type="email"
+                  value={authEmail}
+                  onChange={e => setAuthEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  required
+                />
+              </label>
+
+              <label>
+                Password
+                <input
+                  type="password"
+                  value={authPassword}
+                  onChange={e => setAuthPassword(e.target.value)}
+                  placeholder="Minimum 6 characters"
+                  autoComplete={authMode === "login" ? "current-password" : "new-password"}
+                  minLength="6"
+                  required
+                />
+              </label>
+
+              <button className="generate-btn auth-submit-btn" type="submit" disabled={authLoading}>
+                {authLoading
+                  ? "⏳ Please wait..."
+                  : authMode === "login"
+                  ? "🔐 Login to Yatra AI"
+                  : "✨ Create Account"}
+              </button>
+            </form>
+
+            <p className="auth-note">
+              Your account helps Yatra AI personalize your travel experience.
+            </p>
+          </div>
+        </div>
+      )}
+
+    </div>
+
+  );
+
+}
 
 export default App;
